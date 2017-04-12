@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="596.0" prefWidth="937.0" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+  <tabs>
+    <Tab text="Players">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TableView layoutX="346.0" layoutY="120.0" prefHeight="279.0" prefWidth="536.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="Rank" />
+                        <TableColumn prefWidth="74.0" text="Name" />
+                        <TableColumn prefWidth="97.0" text="Team" />
+                        <TableColumn prefWidth="97.0" text="Date of birth" />
+                        <TableColumn prefWidth="97.0" text="Email" />
+                        <TableColumn prefWidth="97.0" text="Goals" />
+                    </columns>
+                  </TableView>
+                  <Button layoutX="224.0" layoutY="450.0" mnemonicParsing="false" text="Add" />
+                  <Button layoutX="346.0" layoutY="450.0" mnemonicParsing="false" text="Load" />
+                  <Button layoutX="469.0" layoutY="438.0" mnemonicParsing="false" text="Edit" />
+                  <Button layoutX="579.0" layoutY="450.0" mnemonicParsing="false" text="Delete" />
+                  <Label layoutX="27.0" layoutY="120.0" prefHeight="31.0" prefWidth="65.0" text="Name" />
+                  <Label layoutX="27.0" layoutY="174.0" prefHeight="31.0" prefWidth="65.0" text="Date of birth" />
+                  <Label layoutX="27.0" layoutY="238.0" prefHeight="31.0" prefWidth="65.0" text="Email" />
+                  <Label layoutX="27.0" layoutY="295.0" prefHeight="31.0" prefWidth="65.0" text="Team" />
+                  <TextField layoutX="101.0" layoutY="123.0" />
+                  <TextField layoutX="101.0" layoutY="177.0" />
+                  <TextField layoutX="101.0" layoutY="241.0" />
+                  <TextField layoutX="101.0" layoutY="298.0" />
+                  <Button layoutX="467.0" layoutY="475.0" mnemonicParsing="false" text="Save" />
+               </children></AnchorPane>
+      </content>
+    </Tab>
+    <Tab text="Teams">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TableView layoutX="178.0" layoutY="70.0" prefHeight="318.0" prefWidth="591.0">
+                    <columns>
+                      <TableColumn prefWidth="103.0" text="Name" />
+                      <TableColumn prefWidth="175.0" text="Name of player 1" />
+                        <TableColumn prefWidth="175.0" text="Name of player 2" />
+                        <TableColumn prefWidth="137.0" text="Goals" />
+                    </columns>
+                  </TableView>
+                  <Button layoutX="443.0" layoutY="452.0" mnemonicParsing="false" text="Load" />
+               </children></AnchorPane>
+      </content>
+    </Tab>
+      <Tab text="Schedule">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="23.0" layoutY="14.0" prefHeight="17.0" prefWidth="105.0" text="First Round">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <TextField layoutX="23.0" layoutY="64.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField layoutX="23.0" layoutY="117.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField layoutX="259.0" layoutY="171.0" prefHeight="25.0" prefWidth="119.0" />
+                  <Label layoutX="23.0" layoutY="44.0" text="Match 1" />
+                  <Label layoutX="23.0" layoutY="163.0" text="Match 2" />
+                  <TextField layoutX="23.0" layoutY="183.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField layoutX="23.0" layoutY="236.0" prefHeight="25.0" prefWidth="102.0" />
+                  <Label layoutX="23.0" layoutY="275.0" text="Match 3" />
+                  <TextField layoutX="25.0" layoutY="296.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField layoutX="23.0" layoutY="352.0" prefHeight="25.0" prefWidth="102.0" />
+                  <Label layoutX="23.0" layoutY="403.0" text="Match 4" />
+                  <TextField layoutX="25.0" layoutY="420.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField layoutX="25.0" layoutY="473.0" prefHeight="25.0" prefWidth="102.0" />
+                  <Label layoutX="266.0" layoutY="87.0" prefHeight="17.0" prefWidth="105.0" text="Semi Finals">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="259.0" layoutY="151.0" text="Match 1" />
+                  <Label layoutX="62.0" layoutY="94.0" text="VS" />
+                  <Label layoutX="67.0" layoutY="213.0" text="VS" />
+                  <Label layoutX="67.0" layoutY="328.0" text="VS" />
+                  <Label layoutX="67.0" layoutY="450.0" text="VS" />
+                  <Label layoutX="312.0" layoutY="205.0" text="VS" />
+                  <TextField layoutX="259.0" layoutY="230.0" prefHeight="25.0" prefWidth="119.0" />
+                  <Label layoutX="266.0" layoutY="300.0" text="Match 2" />
+                  <TextField layoutX="259.0" layoutY="316.0" prefHeight="25.0" prefWidth="119.0" />
+                  <Label layoutX="312.0" layoutY="352.0" text="VS" />
+                  <TextField layoutX="260.0" layoutY="377.0" prefHeight="25.0" prefWidth="119.0" />
+                  <Label layoutX="560.0" layoutY="193.0" prefHeight="17.0" prefWidth="105.0" text="Final Game">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+                  <TextField layoutX="560.0" layoutY="224.0" prefHeight="25.0" prefWidth="119.0" />
+                  <Label layoutX="613.0" layoutY="261.0" text="VS" />
+                  <TextField layoutX="560.0" layoutY="288.0" prefHeight="25.0" prefWidth="119.0" />
+                  <Button layoutX="788.0" layoutY="238.0" mnemonicParsing="false" prefHeight="64.0" prefWidth="85.0" text="UPDATE" />
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+  </tabs>
+</TabPane>

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static sample.DBConnection.getConnection;
+import static sample.GlobalVariable.nameOfTournamentGlobal;
 
 public class TournamentController implements Initializable {
 
@@ -77,14 +78,19 @@ public class TournamentController implements Initializable {
         try {
             Connection con = getConnection();
             String name = name_Tournament.getText();
-            String databaseName = name+"players";
+            nameOfTournamentGlobal = name;
+            String databaseName1 = nameOfTournamentGlobal+"teams";
+            String databaseName2 = nameOfTournamentGlobal+"players";
             String prize = prize_Tournament.getText();
             String dateStart = date_To_Start.getText();
             String dateFinish = date_To_Finish.getText();
             String sql = "INSERT INTO tournaments VALUES (NULL, '"+name+"', '"+prize+"', '"+dateStart+"', '"+dateFinish+"')";
             con.createStatement().executeUpdate(sql);
-            //String another_sql = "CREATE TABLE "+databaseName+" (ID int NOT NULL AUTO_INCREMENT, team_name VARCHAR(255), player1_name VARCHAR(255), player1_date VARCHAR(255), player1_email VARCHAR(255), player2_name VARCHAR(255), player2_date VARCHAR(255), player2_email VARCHAR(255), PRIMARY KEY (ID))";
-            //con.createStatement().executeUpdate(another_sql);
+            String another_sql = "CREATE TABLE "+databaseName1+"(id int(55) PRIMARY KEY AUTO_INCREMENT, team_name VARCHAR(255), player1_id int(55), player2_id int(55), player1_name VARCHAR(255), player2_name VARCHAR(255), tournament_id int(55), team_goals int(55), winner int(10))";
+            con.createStatement().executeUpdate(another_sql);
+            String ano_sql = "CREATE TABLE "+databaseName2+"(id int(55) PRIMARY KEY AUTO_INCREMENT, player_name VARCHAR(255), player_team VARCHAR(255), player_date VARCHAR(255), player_email VARCHAR(255), player_goals INT(55))";
+            con.createStatement().executeUpdate(ano_sql);
+            con.close();
         } catch (SQLException ex) {
             System.err.println("Error" + ex);
         }
@@ -102,7 +108,7 @@ public class TournamentController implements Initializable {
     public void generateNewTournament(ActionEvent event) throws Exception {
         Node node=(Node) event.getSource();
         Stage stage=(Stage) node.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("Create Teams.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("General Window.fxml"));
         Scene scene = new Scene(root,1024,720);
         stage.setScene(scene);
         stage.show();
@@ -182,7 +188,7 @@ public class TournamentController implements Initializable {
 
         Node node=(Node) event.getSource();
         Stage stage=(Stage) node.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("Create Teams.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("General Window.fxml"));
         Scene scene = new Scene(root,1024,720);
         stage.setTitle(selected.get(0).toString());
         stage.setScene(scene);

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
@@ -10,13 +14,31 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="596.0" prefWidth="937.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="596.0" prefWidth="937.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
   <tabs>
+    <Tab text="Teams">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TableView fx:id="tableTeams" layoutX="190.0" layoutY="80.0" prefHeight="318.0" prefWidth="591.0">
+                    <columns>
+                      <TableColumn fx:id="columnNameTeam" prefWidth="103.0" text="Name" />
+                      <TableColumn fx:id="columnPlayer1Name" prefWidth="175.0" text="Name of player 1" />
+                        <TableColumn fx:id="columnPlayer2Name" prefWidth="175.0" text="Name of player 2" />
+                        <TableColumn fx:id="columnTeamGoals" prefWidth="137.0" text="Goals" />
+                    </columns>
+                  </TableView>
+                  <Button fx:id="loadTeam_button" layoutX="465.0" layoutY="452.0" mnemonicParsing="false" onAction="#loadTeam" text="Load" />
+                  <Button fx:id="addTeam_button" layoutX="382.0" layoutY="452.0" mnemonicParsing="false" onAction="#addTeam" prefHeight="25.0" prefWidth="38.0" text="Add" />
+                  <Button fx:id="deleteTeam_button" layoutX="547.0" layoutY="452.0" mnemonicParsing="false" onAction="#deleteTeam" text="Delete" />
+               </children></AnchorPane>
+      </content>
+    </Tab>
     <Tab text="Players">
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <TableView layoutX="346.0" layoutY="120.0" prefHeight="279.0" prefWidth="536.0">
+                  <TableView fx:id="tableSt" layoutX="346.0" layoutY="120.0" prefHeight="279.0" prefWidth="536.0">
                     <columns>
                         <TableColumn fx:id="columnName" prefWidth="96.0" text="Name" />
                         <TableColumn fx:id="columnTeam" prefWidth="102.0" text="Team" />
@@ -37,23 +59,7 @@
                   <TextField fx:id="date_Player" layoutX="101.0" layoutY="177.0" />
                   <TextField fx:id="email_Player" layoutX="101.0" layoutY="241.0" />
                   <TextField fx:id="team_Player" layoutX="101.0" layoutY="298.0" />
-                  <Button fx:id="save_Player" layoutX="467.0" layoutY="475.0" mnemonicParsing="false" onAction="#savePlayer" text="Save" />
-               </children></AnchorPane>
-      </content>
-    </Tab>
-    <Tab text="Teams">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-               <children>
-                  <TableView layoutX="178.0" layoutY="70.0" prefHeight="318.0" prefWidth="591.0">
-                    <columns>
-                      <TableColumn prefWidth="103.0" text="Name" />
-                      <TableColumn prefWidth="175.0" text="Name of player 1" />
-                        <TableColumn prefWidth="175.0" text="Name of player 2" />
-                        <TableColumn prefWidth="137.0" text="Goals" />
-                    </columns>
-                  </TableView>
-                  <Button layoutX="443.0" layoutY="452.0" mnemonicParsing="false" text="Load" />
+                  <Button fx:id="saveEdit_button" layoutX="467.0" layoutY="475.0" mnemonicParsing="false" onAction="#saveEdit_Player" text="Save" />
                </children></AnchorPane>
       </content>
     </Tab>
@@ -66,19 +72,19 @@
                         <Font size="20.0" />
                      </font>
                   </Label>
-                  <TextField layoutX="23.0" layoutY="64.0" prefHeight="25.0" prefWidth="102.0" />
-                  <TextField layoutX="23.0" layoutY="117.0" prefHeight="25.0" prefWidth="102.0" />
-                  <TextField layoutX="259.0" layoutY="171.0" prefHeight="25.0" prefWidth="119.0" />
+                  <TextField fx:id="match1team1" layoutX="23.0" layoutY="64.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match1team2" layoutX="23.0" layoutY="117.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="matchs1team1" layoutX="259.0" layoutY="171.0" prefHeight="25.0" prefWidth="119.0" />
                   <Label layoutX="23.0" layoutY="44.0" text="Match 1" />
                   <Label layoutX="23.0" layoutY="163.0" text="Match 2" />
-                  <TextField layoutX="23.0" layoutY="183.0" prefHeight="25.0" prefWidth="102.0" />
-                  <TextField layoutX="23.0" layoutY="236.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match2team1" layoutX="23.0" layoutY="183.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match2team2" layoutX="23.0" layoutY="236.0" prefHeight="25.0" prefWidth="102.0" />
                   <Label layoutX="23.0" layoutY="275.0" text="Match 3" />
-                  <TextField layoutX="25.0" layoutY="296.0" prefHeight="25.0" prefWidth="102.0" />
-                  <TextField layoutX="23.0" layoutY="352.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match3team1" layoutX="25.0" layoutY="296.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match3team2" layoutX="23.0" layoutY="352.0" prefHeight="25.0" prefWidth="102.0" />
                   <Label layoutX="23.0" layoutY="403.0" text="Match 4" />
-                  <TextField layoutX="25.0" layoutY="420.0" prefHeight="25.0" prefWidth="102.0" />
-                  <TextField layoutX="25.0" layoutY="473.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match4team1" layoutX="25.0" layoutY="420.0" prefHeight="25.0" prefWidth="102.0" />
+                  <TextField fx:id="match4team2" layoutX="25.0" layoutY="473.0" prefHeight="25.0" prefWidth="102.0" />
                   <Label layoutX="266.0" layoutY="87.0" prefHeight="17.0" prefWidth="105.0" text="Semi Finals">
                      <font>
                         <Font size="20.0" />
@@ -90,19 +96,19 @@
                   <Label layoutX="67.0" layoutY="328.0" text="VS" />
                   <Label layoutX="67.0" layoutY="450.0" text="VS" />
                   <Label layoutX="312.0" layoutY="205.0" text="VS" />
-                  <TextField layoutX="259.0" layoutY="230.0" prefHeight="25.0" prefWidth="119.0" />
+                  <TextField fx:id="matchs1team2" layoutX="259.0" layoutY="230.0" prefHeight="25.0" prefWidth="119.0" />
                   <Label layoutX="266.0" layoutY="300.0" text="Match 2" />
-                  <TextField layoutX="259.0" layoutY="316.0" prefHeight="25.0" prefWidth="119.0" />
+                  <TextField fx:id="matchs2team1" layoutX="259.0" layoutY="316.0" prefHeight="25.0" prefWidth="119.0" />
                   <Label layoutX="312.0" layoutY="352.0" text="VS" />
-                  <TextField layoutX="260.0" layoutY="377.0" prefHeight="25.0" prefWidth="119.0" />
+                  <TextField fx:id="matchs2team2" layoutX="260.0" layoutY="377.0" prefHeight="25.0" prefWidth="119.0" />
                   <Label layoutX="560.0" layoutY="193.0" prefHeight="17.0" prefWidth="105.0" text="Final Game">
                      <font>
                         <Font size="20.0" />
                      </font>
                   </Label>
-                  <TextField layoutX="560.0" layoutY="224.0" prefHeight="25.0" prefWidth="119.0" />
+                  <TextField fx:id="matchfteam1" layoutX="560.0" layoutY="224.0" prefHeight="25.0" prefWidth="119.0" />
                   <Label layoutX="613.0" layoutY="261.0" text="VS" />
-                  <TextField layoutX="560.0" layoutY="288.0" prefHeight="25.0" prefWidth="119.0" />
+                  <TextField fx:id="matchfteam2" layoutX="560.0" layoutY="288.0" prefHeight="25.0" prefWidth="119.0" />
                   <Button layoutX="788.0" layoutY="238.0" mnemonicParsing="false" prefHeight="64.0" prefWidth="85.0" text="UPDATE" />
                </children>
             </AnchorPane>

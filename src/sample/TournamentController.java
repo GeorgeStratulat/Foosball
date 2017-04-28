@@ -31,7 +31,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static sample.DBConnection.getConnection;
-import static sample.GlobalVariable.nameOfTournamentGlobal;
+import static sample.GlobalVariable.selectedTournament;
+
+
 
 public class TournamentController implements Initializable {
 
@@ -48,48 +50,22 @@ public class TournamentController implements Initializable {
     @FXML
     private AnchorPane rootPane1;
     @FXML
-    private Button generate_New_Tournament;
-    @FXML
     private Button save_New_Team;
-    @FXML
-    private TextField new_Team_Name;
-    @FXML
-    private TextField new_Player1_Name;
-    @FXML
-    private TextField new_Player1_Date;
-    @FXML
-    private TextField new_Player1_Email;
-    @FXML
-    private TextField new_Player2_Name;
-    @FXML
-    private TextField new_Player2_Date;
-    @FXML
-    private TextField new_Player2_Email;
     @FXML
     private TableView tournaments;
 
     private ObservableList<ObservableList> data;
 
-
-    String Name_Tournament;
+    private int[] tournametsSQLID = new int[15];
 
     @FXML
     private void createNewTournament(ActionEvent event) throws Exception {
+
         try {
             Connection con = getConnection();
-            String name = name_Tournament.getText();
-            nameOfTournamentGlobal = name;
-            String databaseName1 = nameOfTournamentGlobal+"teams";
-            String databaseName2 = nameOfTournamentGlobal+"players";
-            String prize = prize_Tournament.getText();
-            String dateStart = date_To_Start.getText();
-            String dateFinish = date_To_Finish.getText();
-            String sql = "INSERT INTO tournaments VALUES (NULL, '"+name+"', '"+prize+"', '"+dateStart+"', '"+dateFinish+"')";
-            con.createStatement().executeUpdate(sql);
-            String another_sql = "CREATE TABLE "+databaseName1+"(id int(55) PRIMARY KEY AUTO_INCREMENT, team_name VARCHAR(255), player1_id int(55), player2_id int(55), player1_name VARCHAR(255), player2_name VARCHAR(255), tournament_id int(55), team_goals int(55), winner int(10))";
-            con.createStatement().executeUpdate(another_sql);
-            String ano_sql = "CREATE TABLE "+databaseName2+"(id int(55) PRIMARY KEY AUTO_INCREMENT, player_name VARCHAR(255), player_team VARCHAR(255), player_date VARCHAR(255), player_email VARCHAR(255), player_goals INT(55))";
-            con.createStatement().executeUpdate(ano_sql);
+            String query = "INSERT INTO tournaments(`tournament_name`,`tournament_prize`, `tournament_dateToStart`,`tournament_dateToFinish`) " +
+                    "VALUES ('"+name_Tournament.getText()+"', '"+prize_Tournament.getText()+"', '"+date_To_Start.getText()+"', '"+date_To_Finish.getText()+"')";
+            con.createStatement().executeUpdate(query);
             con.close();
         } catch (SQLException ex) {
             System.err.println("Error" + ex);
@@ -104,16 +80,6 @@ public class TournamentController implements Initializable {
 
     }
 
-    @FXML
-    public void generateNewTournament(ActionEvent event) throws Exception {
-        Node node=(Node) event.getSource();
-        Stage stage=(Stage) node.getScene().getWindow();
-        Parent root = FXMLLoader.load(getClass().getResource("General Window.fxml"));
-        Scene scene = new Scene(root,1024,720);
-        stage.setScene(scene);
-        stage.show();
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle rb){
         // TODO
@@ -126,18 +92,16 @@ public class TournamentController implements Initializable {
         catch (Exception e){
 
         }
-        // tournaments.getItems().setAll(this.data);
     }
 
     @FXML
     private void getTournaments() throws Exception {
         Connection con = getConnection();
-        //String sql = "SELECT name FROM tournaments LIMIT 4";
         data = FXCollections.observableArrayList();
         try{
             Connection c = DBConnection.getConnection();
             //SQL FOR SELECTING ALL OF CUSTOMER
-            String SQL = "SELECT id,name FROM tournaments ORDER BY id DESC LIMIT 4";
+            String SQL = "SELECT tournament_id,tournament_name FROM tournaments ORDER BY tournament_id DESC LIMIT 10";
             //ResultSet
             ResultSet rs = c.createStatement().executeQuery(SQL);
 
@@ -155,20 +119,21 @@ public class TournamentController implements Initializable {
                 });
 
                 tournaments.getColumns().addAll(col);
-                System.out.println("Column ["+i+"] ");
             }
 
             /********************************
              * Data added to ObservableList *
              ********************************/
+            int z = 0;
             while(rs.next()){
                 //Iterate Row
+                tournametsSQLID[z++] = rs.getInt("tournament_id");
                 ObservableList<String> row = FXCollections.observableArrayList();
                 for(int i=1 ; i<=rs.getMetaData().getColumnCount(); i++){
                     //Iterate Column
-                    row.add(rs.getString(i));
+                    //
+                    System.out.println(row.add(rs.getString(i)));
                 }
-                System.out.println("Row [1] added "+row );
                 data.add(row);
 
             }
@@ -184,7 +149,7 @@ public class TournamentController implements Initializable {
     @FXML
     private void viewTournament(ActionEvent event) throws Exception{
         List selected = tournaments.getSelectionModel().getSelectedItems();
-        System.out.println(selected.get(0));
+        selectedTournament = tournametsSQLID[tournaments.getSelectionModel().getSelectedIndex()];
 
         Node node=(Node) event.getSource();
         Stage stage=(Stage) node.getScene().getWindow();

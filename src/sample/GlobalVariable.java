@@ -5,4 +5,5 @@ package sample;
  */
 public class GlobalVariable {
     public static String nameOfTournamentGlobal = "";
+    public static int selectedTournament;
 }

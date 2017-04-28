@@ -1,5 +1,6 @@
 package sample;
 
+import com.sun.javafx.text.TextLine;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -21,8 +23,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static sample.DBConnection.getConnection;
+import static sample.GlobalVariable.selectedTournament;
 
 public class Controller {
 
@@ -67,7 +73,7 @@ public class Controller {
     @FXML
     private TableColumn<Players, String> columnEmail;
     @FXML
-    private TableColumn<Players, String> columnDate;
+    private TableColumn<Players, String> columnBirthday;
     @FXML
     private TableColumn<Players, String> columnGoals;
     @FXML
@@ -75,6 +81,7 @@ public class Controller {
 
     private ObservableList<Players> dataPlayers;
     private ObservableList<Teams> dataTeams;
+    private ObservableList<Game> GameData;
     @FXML
     private Button addTeam_button;
     @FXML
@@ -83,78 +90,31 @@ public class Controller {
     private Button deleteTeam_button;
 
     @FXML
-    private void addPlayer(ActionEvent event) throws FileNotFoundException {
-
-        String name = name_Player.getText();
-        String email = date_Player.getText();
-        String date = email_Player.getText();
-        String team = team_Player.getText();
-        String databasename = GlobalVariable.nameOfTournamentGlobal+"players";
-
+    private void loadPlayer() throws FileNotFoundException {
         try {
-            String sql = "INSERT INTO "+databasename+" VALUES ( NULL, '"+name+"', '"+team+"', '" +date+ "', '" +email+ "', 0);";
-            Connection connection = DBConnection.getConnection();
-            Statement stmt = connection.createStatement();
-            stmt.executeUpdate(sql);
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        name_Player.setText("");
-        date_Player.setText("");
-        email_Player.setText("");
-
-    }
-
-
-    @FXML
-    private void loadPlayer(javafx.event.ActionEvent event) throws FileNotFoundException {
-        try {
-            String databasename = GlobalVariable.nameOfTournamentGlobal+"players";
             Connection con = getConnection();
             dataPlayers = FXCollections.observableArrayList();
 
-            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM '"+databasename+"'");
+            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM `tournament_players` INNER JOIN  `tournament_teams` ON `team_id` = `player_team` WHERE `tournament_id` =" + GlobalVariable.selectedTournament);
             while (rs.next()) {
-                dataPlayers.add(new Players(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6)));
+                dataPlayers.add(new Players(rs.getInt(1), rs.getString(2), rs.getString(9), rs.getString(4), rs.getString(5), rs.getInt(6)));
+
             }
             con.close();
         } catch (SQLException ex) {
-            System.err.println("Error" + ex);
+            System.err.println("Error:" + ex);
         }
         columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        columnEmail.setCellValueFactory(new PropertyValueFactory<>("team"));
-        columnTeam.setCellValueFactory(new PropertyValueFactory<>("date"));
-        columnDate.setCellValueFactory(new PropertyValueFactory<Players, String>("email"));
-        columnGoals.setCellValueFactory(new PropertyValueFactory<Players, String>("goals"));
+        columnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        columnTeam.setCellValueFactory(new PropertyValueFactory<>("team"));
+        columnGoals.setCellValueFactory(new PropertyValueFactory<>("goals"));
+        columnBirthday.setCellValueFactory(new PropertyValueFactory<>("birthday"));
+
         tableSt.setItems(null);
         tableSt.setItems(dataPlayers);
 
     }
 
-    @FXML
-    private void deletePlayer(ActionEvent event) throws FileNotFoundException {
-        String databasename = GlobalVariable.nameOfTournamentGlobal+"players";
-        ObservableList<Players> playersSelected, allPlayers;
-        allPlayers = tableSt.getItems();
-        playersSelected = tableSt.getSelectionModel().getSelectedItems();
-        Players players = tableSt.getSelectionModel().getSelectedItem();
-
-        try {
-            Connection con = getConnection();
-
-            con.createStatement().executeUpdate("DELETE FROM '"+databasename+"' WHERE id=" + players.getId());
-
-            con.close();
-        } catch (SQLException ex) {
-            System.err.println("Error" + ex);
-        }
-
-        playersSelected.forEach(allPlayers::remove);
-
-
-    }
 
     @FXML
     private void editPlayer(ActionEvent event) throws FileNotFoundException {
@@ -162,9 +122,8 @@ public class Controller {
         Players player;
         player = tableSt.getSelectionModel().getSelectedItem();
         name_Player.setText(player.getName());
-        date_Player.setText(player.getEmail());
+        date_Player.setText(player.getBirthday());
         email_Player.setText(player.getEmail());
-        team_Player.setText(player.getTeam());
 
     }
 
@@ -176,17 +135,19 @@ public class Controller {
 
         Players player = tableSt.getSelectionModel().getSelectedItem();
         try {
-            String databasename = GlobalVariable.nameOfTournamentGlobal+"players";
             Connection con = getConnection();
 
 
-            String sql = "UPDATE '"+databasename+"' SET player_name='" + name_Player.getText() + "', player_team='" + team_Player.getText() + "', player_date='" + date_Player.getText() + "',player_email='" +email_Player+"', player_goals=0 WHERE id = " + player.getId();
-            con.createStatement().executeUpdate(sql);
-
+            String query = "UPDATE `tournament_players` SET player_name='" + name_Player.getText() + "', player_birthday='" + date_Player.getText() + "',player_email='" +email_Player.getText()+"' WHERE `player_id` = " + player.getId();
+            con.createStatement().executeUpdate(query);
+            name_Player.setText("");
+            date_Player.setText("");
+            email_Player.setText("");
             con.close();
         } catch (SQLException ex) {
             System.err.println("Error" + ex);
         }
+        loadPlayer();
     }
 
     @FXML
@@ -200,20 +161,6 @@ public class Controller {
     @FXML
     private javafx.scene.control.TableView<Teams> tableTeams;
 
-    @FXML
-    private void addTeam(ActionEvent event) throws Exception{
-
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Create Teams.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root1));
-            stage.show();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @FXML
     public void saveNewTeam(ActionEvent event) throws Exception{
@@ -227,25 +174,16 @@ public class Controller {
             String name_Player2 = new_Player2_Name.getText();
             String date_Player2 = new_Player2_Date.getText();
             String email_Player2 = new_Player2_Email.getText();
-            String databasename1 = GlobalVariable.nameOfTournamentGlobal+"players";
-            String databasename2 = GlobalVariable.nameOfTournamentGlobal+"teams";
-            int id_Player1 = 0, id_Player2 = 0 , id_Tournament = 0;
+            int team_id;
 
-            String ano_sql = "INSERT INTO "+databasename1+" VALUES(NULL, '"+name_Player1+"', '"+name_Team+"', '"+date_Player1+"', '"+email_Player1+"', 0)";
-            con.createStatement().executeUpdate(ano_sql);
-            ResultSet rs1 = con.createStatement().executeQuery("SELECT * FROM "+databasename1+" ORDER BY id DESC LIMIT 1");
-            if(rs1.next())
-            id_Player1 = rs1.getInt(1);
-            String another_sql = "INSERT INTO "+databasename1+" VALUES(NULL, '"+name_Player2+"', '"+name_Team+"', '"+date_Player2+"', '"+email_Player2+"', 0)";
-            con.createStatement().executeUpdate(another_sql);
-            ResultSet rs2 = con.createStatement().executeQuery("SELECT * FROM "+databasename1+" ORDER BY id DESC LIMIT 1");
-            if(rs2.next())
-            id_Player2 = rs2.getInt(1);
-            ResultSet rs3 = con.createStatement().executeQuery("SELECT id FROM tournaments WHERE name='"+GlobalVariable.nameOfTournamentGlobal+"'");
-            if(rs3.next())
-            id_Tournament = rs3.getInt(1);
-            String sql = "INSERT INTO "+databasename2+" VALUES (NULL, '"+name_Team+"', '"+id_Player1+"', '"+id_Player2+"', '"+name_Player1+"', '"+name_Player2+"', '"+id_Tournament+"', 0, 1)";
-            con.createStatement().executeUpdate(sql);
+            con.createStatement().executeUpdate("INSERT INTO `tournament_teams` (`tournament_id`, `team_name`) VALUES('"+ selectedTournament +"', '" + name_Team  + "')");
+            ResultSet query_result = con.createStatement().executeQuery("SELECT `team_id` FROM `tournament_teams` ORDER BY `team_id` DESC LIMIT 1");
+            query_result.next();
+            team_id = query_result.getInt(1);
+            con.createStatement().executeUpdate("INSERT INTO `tournament_players`(`player_name`,`player_team`, `player_birthday`, `player_email`) VALUES ('" + name_Player1 +"', " + team_id  + ", '" + date_Player1 + "', '" + email_Player1 + "')");
+            con.createStatement().executeUpdate("INSERT INTO `tournament_players`(`player_name`,`player_team`, `player_birthday`, `player_email`) VALUES ('" + name_Player2 +"', " + team_id  + ", '" + date_Player2 + "', '" + email_Player2 + "')");
+
+
 
             con.close();
 
@@ -256,6 +194,11 @@ public class Controller {
             new_Player2_Name.setText("");
             new_Player2_Date.setText("");
             new_Player2_Email.setText("");
+            Teams team = new Teams(team_id,selectedTournament,name_Team, 0, 0 ,0);
+            team.addFirstPlayer(name_Player1);
+            team.addSecondPlayer(name_Player2);
+            tableTeams.getItems().add(team);
+
 
         } catch (SQLException ex) {
             System.err.println("Error" + ex);
@@ -268,7 +211,6 @@ public class Controller {
     @FXML
     private void deleteTeam(ActionEvent event) throws FileNotFoundException {
 
-        String databasename = GlobalVariable.nameOfTournamentGlobal+"teams";
         ObservableList<Teams> teamsSelected, allTeams;
         allTeams = tableTeams.getItems();
         teamsSelected = tableTeams.getSelectionModel().getSelectedItems();
@@ -277,7 +219,7 @@ public class Controller {
         try {
             Connection con = getConnection();
 
-            con.createStatement().executeUpdate("DELETE FROM '"+databasename+"' WHERE id=" + teams.getIdOfTeam());
+            con.createStatement().executeUpdate("DELETE FROM `tournament_teams` WHERE `team_id`=" + teams.getIdOfTeam());
 
             con.close();
         } catch (SQLException ex) {
@@ -288,22 +230,29 @@ public class Controller {
     }
 
     @FXML
-    private void loadTeam(ActionEvent event) throws FileNotFoundException {
+    private void loadTeam() throws FileNotFoundException {
 
         try {
-            String databasename = GlobalVariable.nameOfTournamentGlobal+"teams";
             Connection con = getConnection();
             dataTeams = FXCollections.observableArrayList();
 
-            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM '"+databasename+"'");
+            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM `tournament_teams` WHERE `tournament_id` = " + selectedTournament);
             while (rs.next()) {
-                dataTeams.add(new Teams(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getInt(9)));
+                Teams team = new Teams(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getInt(4),  rs.getInt(5),  rs.getInt(6));
+                ResultSet result = con.createStatement().executeQuery("SELECT `player_name` FROM `tournament_players` WHERE `player_team` = " + rs.getInt(1));
+                result.next();
+                team.addFirstPlayer(result.getString(1));
+                result.next();
+                team.addSecondPlayer(result.getString(1));
+                dataTeams.add(team);
+
             }
             con.close();
         } catch (SQLException ex) {
             System.err.println("Error" + ex);
         }
-        columnNameTeam.setCellValueFactory(new PropertyValueFactory<>("name_Of_Team"));
+
+        columnNameTeam.setCellValueFactory(new PropertyValueFactory<>("team_name"));
         columnPlayer1Name.setCellValueFactory(new PropertyValueFactory<>("player1_name"));
         columnPlayer2Name.setCellValueFactory(new PropertyValueFactory<>("player2_name"));
         columnTeamGoals.setCellValueFactory(new PropertyValueFactory<>("team_goals"));
@@ -313,32 +262,102 @@ public class Controller {
     }
 
     @FXML
-    private TextField match1team1;
+    private TableColumn<Teams, String> columnFirstTeam;
     @FXML
-    private TextField match1team2;
+    private TableColumn<Teams, String> columnSecondTeam;
     @FXML
-    private TextField match2team1;
+    private TableColumn<Teams, String> columnScore;
     @FXML
-    private TextField match2team2;
+    private javafx.scene.control.TableView<Game> tableGames;
     @FXML
-    private TextField match3team1;
+    private Button resetGames;
     @FXML
-    private TextField match3team2;
+    private Button startGame;
     @FXML
-    private TextField match4team1;
+    private Button nextStage;
+
     @FXML
-    private TextField match4team2;
+    private void loadGames(){
+        try {
+            Connection connHandle = getConnection();
+            ResultSet r = connHandle.createStatement().executeQuery("SELECT * `tournament_games` WHERE `tournament_id` =" + selectedTournament);
+            while(r.next()){
+                GameData.add(new Game(r.getInt(1), r.getInt(2), r.getInt(3), 0, 0, dataTeams.get(r.getInt()-1).getTeam_name(), dataTeams.get(secondTeam-1).getTeam_name() ));
+            }
+            connHandle.close();
+        }
+        catch (SQLException ex) {
+            System.err.println("Error" + ex);
+        }
+        columnFirstTeam.setCellValueFactory(new PropertyValueFactory<>("firstTeamName"));
+        columnSecondTeam.setCellValueFactory(new PropertyValueFactory<>("secondTeamName"));
+        columnScore.setCellValueFactory(new PropertyValueFactory<>("Score"));
+
+        tableGames.setItems(null);
+        tableGames.setItems(GameData);
+    }
     @FXML
-    private TextField matchs1team1;
+    private void StartGame(ActionEvent event){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Match.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
-    private TextField matchs1team2;
+    private void ResetGames(ActionEvent e)  throws FileNotFoundException{
+        try{
+            Connection connHandle = getConnection();
+            connHandle.createStatement().executeUpdate("DELETE FROM `tournament_games` WHERE `tournament_id` =" + selectedTournament);
+            if(dataTeams.size() % 2 != 0){
+                AlertBox.display("Invalid Number of Teams", "   There must be an even number of teams.    \n\n\n\n");
+            }
+            else{
+                GameData = FXCollections.observableArrayList();
+                Random r = new Random();
+                int numberOfGames = 0, firstTeam, secondTeam;
+                ArrayList<Integer> usedTeams = new ArrayList<>();
+                while(numberOfGames != dataTeams.size() / 2){
+                    boolean condition = false;
+                    while(!condition){
+                        firstTeam = r.nextInt(dataTeams.size()) + 1;
+                        secondTeam = r.nextInt(dataTeams.size()) + 1;
+                        if(usedTeams.indexOf(firstTeam) == -1 && usedTeams.indexOf(secondTeam) == -1 && firstTeam != secondTeam){
+                            usedTeams.add(firstTeam);
+                            usedTeams.add(secondTeam);
+                            condition = true;
+                            connHandle.createStatement().executeUpdate("INSERT INTO `tournament_games` (`game_team1`,`game_team2`,`tournament_id`) VALUES ('" + firstTeam +"', '" + secondTeam +"', '" + selectedTournament +"' )");
+                            ResultSet re = connHandle.createStatement().executeQuery("SELECT `game_id` FROM `tournament_games` ORDER BY game_id DESC LIMIT 1");
+                            re.next();
+                            GameData.add(new Game(re.getInt(1), firstTeam, secondTeam, 0, 0, dataTeams.get(firstTeam-1).getTeam_name(), dataTeams.get(secondTeam-1).getTeam_name() ));
+                        }
+                    }
+                    numberOfGames++;
+                }
+                columnFirstTeam.setCellValueFactory(new PropertyValueFactory<>("firstTeamName"));
+                columnSecondTeam.setCellValueFactory(new PropertyValueFactory<>("secondTeamName"));
+                columnScore.setCellValueFactory(new PropertyValueFactory<>("Score"));
+
+                tableGames.setItems(null);
+                tableGames.setItems(GameData);
+            }
+
+
+
+            connHandle.close();
+        }
+        catch (SQLException ex) {
+            System.err.println("Error" + ex);
+        }
+    }
     @FXML
-    private TextField matchs2team1;
-    @FXML
-    private TextField matchs2team2;
-    @FXML
-    private TextField matchfteam1;
-    @FXML
-    private TextField matchfteam2;
+    private void NextStage(ActionEvent e){
+
+    }
+
 
 }

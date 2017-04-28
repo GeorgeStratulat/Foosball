@@ -11,16 +11,16 @@ public class Players {
     private final StringProperty email;
     private final StringProperty team;
     private final IntegerProperty id;
-    private final StringProperty date;
+    private final StringProperty birthday;
 
-    public Players(int id, String name, String team, String date, String email, int goals){
+    public Players(int id, String name, String team, String birthday, String email, int goals){
 
         this.id = new SimpleIntegerProperty(id);
         this.goals = new SimpleIntegerProperty(goals) ;
         this.name = new SimpleStringProperty(name);
         this.email = new SimpleStringProperty(email);
         this.team = new SimpleStringProperty(team);
-        this.date = new SimpleStringProperty(date);
+        this.birthday = new SimpleStringProperty(birthday);
     }
 
 
@@ -38,6 +38,8 @@ public class Players {
     public String getTeam(){return team.get();
     }
     public int getId(){return id.get();}
+
+    public String getBirthday(){return birthday.get();}
 
     public void setGoals(int value){goals.set(value);}
 

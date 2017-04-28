@@ -10,26 +10,70 @@ import javafx.beans.value.ObservableValue;
  */
 public class Teams {
     private final IntegerProperty team_id;
-    private final StringProperty name_Of_Team;
-    private final IntegerProperty player1_id;
-    private final IntegerProperty player2_id;
+    private StringProperty player1_name;
+    private StringProperty player2_name;
+    private final StringProperty team_name;
     private final IntegerProperty tournament_id;
-    private final IntegerProperty winner;
-    private final StringProperty player1_name;
-    private final StringProperty player2_name;
+    private int team_winnings;
+    private final int team_loses;
     private final IntegerProperty team_goals;
 
-    public Teams(int team_id, String name_Of_Team, int player1_id, int player2_id, String player1_name, String player2_name, int tournament_id, int team_goals, int winner) {
+    public Teams(int team_id, int tournament_id, String team_name,  int team_goals, int team_winnings, int team_loses) {
 
         this.team_id = new SimpleIntegerProperty(team_id);
-        this.name_Of_Team = new SimpleStringProperty(name_Of_Team);
-        this.player1_id= new SimpleIntegerProperty(player1_id);
-        this.player2_id = new SimpleIntegerProperty(player2_id);
-        this.player1_name = new SimpleStringProperty(player1_name);
-        this.player2_name = new SimpleStringProperty(player2_name);
+        this.team_name = new SimpleStringProperty(team_name);
         this.tournament_id = new SimpleIntegerProperty(tournament_id);
         this.team_goals = new SimpleIntegerProperty(team_goals);
-        this.winner = new SimpleIntegerProperty(winner);
+        this.team_winnings = team_winnings;
+        this.team_loses = team_loses;
+
+    }
+
+    public void addFirstPlayer(String playerName){
+        this.player1_name = new SimpleStringProperty(playerName);
+    }
+    public void addSecondPlayer(String playerName){
+        this.player2_name = new SimpleStringProperty(playerName);
+    }
+
+    public int getTournament_id() {
+        return tournament_id.get();
+    }
+
+    public IntegerProperty tournament_idProperty() {
+        return tournament_id;
+    }
+
+    public void setTournament_id(int tournament_id) {
+        this.tournament_id.set(tournament_id);
+    }
+
+    public String getPlayer1_name() {
+        return player1_name.get();
+    }
+
+    public StringProperty player1_nameProperty() {
+        return player1_name;
+    }
+
+    public void setPlayer1_name(String player1_name) {
+        this.player1_name.set(player1_name);
+    }
+
+    public String getPlayer2_name() {
+        return player2_name.get();
+    }
+
+    public StringProperty player2_nameProperty() {
+        return player2_name;
+    }
+
+    public void setPlayer2_name(String player2_name) {
+        this.player2_name.set(player2_name);
+    }
+
+    public int getTeam_loses() {
+        return team_loses;
     }
 
     public int getIdOfTeam(){
@@ -37,9 +81,16 @@ public class Teams {
         return team_id.get();
     }
 
-    public String getNameOfTeam() {
+    public String getTeam_name() {
+        return team_name.get();
+    }
 
-        return name_Of_Team.get();
+    public StringProperty team_nameProperty() {
+        return team_name;
+    }
+
+    public void setTeam_name(String team_name) {
+        this.team_name.set(team_name);
     }
 
     public void setTeam_id(int value){
@@ -47,14 +98,10 @@ public class Teams {
         team_id.set(value);
     }
 
-    public void setName_Of_Team(String value) {
-
-        name_Of_Team.set(value);
-    }
 
     public StringProperty nameProperty() {
 
-        return name_Of_Team;
+        return team_name;
     }
 
     public IntegerProperty idProperty(){
@@ -64,27 +111,29 @@ public class Teams {
 
     public int getWinner(){
 
-        return winner.get();
+        return team_winnings;
     }
 
     public void setWinner(int value){
 
-        winner.set(value);
+        this.team_winnings = value;
     }
 
-    public IntegerProperty winnerProperty(){
+    public int winnerProperty(){
 
-        return winner;
+        return team_winnings;
     }
 
-    public int getGoalsOfTeam(){
-
+    public int getTeam_goals() {
         return team_goals.get();
     }
 
-    public IntegerProperty goalsTeamProperty(){
-
+    public IntegerProperty team_goalsProperty() {
         return team_goals;
+    }
+
+    public void setTeam_goals(int team_goals) {
+        this.team_goals.set(team_goals);
     }
 }
 

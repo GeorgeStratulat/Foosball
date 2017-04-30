@@ -1,6 +1,7 @@
 package sample;
 
 import com.sun.javafx.text.TextLine;
+import java.util.Collections;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -29,11 +30,10 @@ import java.util.Random;
 
 import static sample.DBConnection.getConnection;
 import static sample.GlobalVariable.selectedTournament;
+import static sample.GlobalVariable.selectedGame;
 
 public class Controller {
 
-    @FXML
-    private Button save_New_Team;
     @FXML
     private TextField new_Team_Name;
     @FXML
@@ -48,16 +48,6 @@ public class Controller {
     private TextField new_Player2_Date;
     @FXML
     private TextField new_Player2_Email;
-    @FXML
-    private Button add_Player;
-    @FXML
-    private Button load_Player;
-    @FXML
-    private Button edit_Player;
-    @FXML
-    private Button save_Player;
-    @FXML
-    private Button delete_Player;
     @FXML
     private TextField name_Player;
     @FXML
@@ -79,31 +69,102 @@ public class Controller {
     @FXML
     private javafx.scene.control.TableView<Players> tableSt;
 
-    private ObservableList<Players> dataPlayers;
-    private ObservableList<Teams> dataTeams;
-    private ObservableList<Game> GameData;
-    @FXML
-    private Button addTeam_button;
-    @FXML
-    private Button loadTeam_button;
-    @FXML
-    private Button deleteTeam_button;
+    public static ObservableList<Players> dataPlayers;
+    public static ObservableList<Teams> dataTeams;
+    public static ObservableList<Game> GameData;
 
-    @FXML
-    private void loadPlayer() throws FileNotFoundException {
-        try {
-            Connection con = getConnection();
-            dataPlayers = FXCollections.observableArrayList();
 
-            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM `tournament_players` INNER JOIN  `tournament_teams` ON `team_id` = `player_team` WHERE `tournament_id` =" + GlobalVariable.selectedTournament);
-            while (rs.next()) {
-                dataPlayers.add(new Players(rs.getInt(1), rs.getString(2), rs.getString(9), rs.getString(4), rs.getString(5), rs.getInt(6)));
+    private static final int FETCH_PLAYERS = 1;
+    private static final int FETCH_TEAMS = 2;
+    private static final int FETCH_GAMES = 3;
 
-            }
-            con.close();
-        } catch (SQLException ex) {
-            System.err.println("Error:" + ex);
+    public void FETCH_DATA(int type){
+        switch (type){
+            /*
+            ================================================================
+                                LOAD PLAYERS DATA
+            ================================================================
+            */
+            case FETCH_PLAYERS:
+                try {
+                    Connection con = getConnection();
+                    dataPlayers = FXCollections.observableArrayList();
+
+                    ResultSet rs = con.createStatement().executeQuery("SELECT * FROM `tournament_players` INNER JOIN  `tournament_teams` ON `team_id` = `player_team` WHERE `tournament_id` =" + GlobalVariable.selectedTournament);
+                    while (rs.next()) {
+                        dataPlayers.add(new Players(rs.getInt(1), rs.getString(2), rs.getString(9), rs.getString(4), rs.getString(5), rs.getInt(6), rs.getInt(7)));
+
+                    }
+                    con.close();
+                } catch (SQLException ex) {
+                    System.err.println("Error:" + ex);
+                }
+                break;
+            /*
+            ================================================================
+                                LOAD TEAMS DATA
+            ================================================================
+             */
+            case FETCH_TEAMS:
+                try {
+                    Connection con = getConnection();
+                    dataTeams = FXCollections.observableArrayList();
+
+                    ResultSet rs = con.createStatement().executeQuery("SELECT * FROM `tournament_teams` WHERE `tournament_id` = " + selectedTournament);
+                    while (rs.next()) {
+                        Teams team = new Teams(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getInt(4),  rs.getInt(5),  rs.getInt(6));
+                        ResultSet result = con.createStatement().executeQuery("SELECT `player_name` FROM `tournament_players` WHERE `player_team` = " + rs.getInt(1));
+                        result.next();
+                        team.addFirstPlayer(result.getString(1));
+                        result.next();
+                        team.addSecondPlayer(result.getString(1));
+                        dataTeams.add(team);
+                    }
+                    con.close();
+                } catch (SQLException ex) {
+                    System.err.println("Error" + ex);
+                }
+                break;
+            /*
+            ================================================================
+                                LOAD GAMES DATA
+            ================================================================
+             */
+            case FETCH_GAMES:
+                try {
+                    Connection connHandle = getConnection();
+                    ResultSet r = connHandle.createStatement().executeQuery("SELECT * FROM `tournament_games` WHERE `tournament_id` =" + selectedTournament + " AND `ended` = 0");
+                    GameData = FXCollections.observableArrayList();
+                    while(r.next()){
+
+                        int
+                                firstTeamScriptID = 0,
+                                secondTeamScriptID = 0,
+                                fistTeamID = r.getInt(2),
+                                secondTeamID = r.getInt(3);
+
+
+                        for(int i =0; i < dataTeams.size(); i++) {
+                            if (dataTeams.get(i).getIdOfTeam() == fistTeamID)
+                                firstTeamScriptID = i;
+                            else if (dataTeams.get(i).getIdOfTeam() == secondTeamID)
+                                secondTeamScriptID = i;
+                        }
+                        GameData.add(new Game(r.getInt(1), r.getInt(2), r.getInt(3), r.getInt(4), r.getInt(5), dataTeams.get(firstTeamScriptID).getTeam_name(), dataTeams.get(secondTeamScriptID).getTeam_name(), firstTeamScriptID, secondTeamScriptID ));
+
+                    }
+
+                }
+                catch (SQLException ex) {
+                    System.err.println("Error" + ex);
+                }
+                break;
         }
+    }
+
+    @FXML
+    public void loadPlayer() {
+        FETCH_DATA(FETCH_PLAYERS);
         columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         columnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         columnTeam.setCellValueFactory(new PropertyValueFactory<>("team"));
@@ -112,7 +173,7 @@ public class Controller {
 
         tableSt.setItems(null);
         tableSt.setItems(dataPlayers);
-
+        System.out.println(dataPlayers);
     }
 
 
@@ -127,8 +188,6 @@ public class Controller {
 
     }
 
-    @FXML
-    private Button saveEdit_button;
 
     @FXML
     private void saveEdit_Player(ActionEvent event) throws FileNotFoundException {
@@ -136,8 +195,6 @@ public class Controller {
         Players player = tableSt.getSelectionModel().getSelectedItem();
         try {
             Connection con = getConnection();
-
-
             String query = "UPDATE `tournament_players` SET player_name='" + name_Player.getText() + "', player_birthday='" + date_Player.getText() + "',player_email='" +email_Player.getText()+"' WHERE `player_id` = " + player.getId();
             con.createStatement().executeUpdate(query);
             name_Player.setText("");
@@ -182,7 +239,7 @@ public class Controller {
             team_id = query_result.getInt(1);
             con.createStatement().executeUpdate("INSERT INTO `tournament_players`(`player_name`,`player_team`, `player_birthday`, `player_email`) VALUES ('" + name_Player1 +"', " + team_id  + ", '" + date_Player1 + "', '" + email_Player1 + "')");
             con.createStatement().executeUpdate("INSERT INTO `tournament_players`(`player_name`,`player_team`, `player_birthday`, `player_email`) VALUES ('" + name_Player2 +"', " + team_id  + ", '" + date_Player2 + "', '" + email_Player2 + "')");
-
+            con.createStatement().executeUpdate("DELETE FROM `tournament_games` WHERE `tournament_id` =" + selectedTournament);
 
 
             con.close();
@@ -210,55 +267,28 @@ public class Controller {
 
     @FXML
     private void deleteTeam(ActionEvent event) throws FileNotFoundException {
-
-        ObservableList<Teams> teamsSelected, allTeams;
-        allTeams = tableTeams.getItems();
-        teamsSelected = tableTeams.getSelectionModel().getSelectedItems();
         Teams teams = tableTeams.getSelectionModel().getSelectedItem();
-
         try {
             Connection con = getConnection();
-
             con.createStatement().executeUpdate("DELETE FROM `tournament_teams` WHERE `team_id`=" + teams.getIdOfTeam());
-
+            con.createStatement().executeUpdate("DELETE FROM `tournament_games` WHERE `tournament_id` =" + selectedTournament);
+            con.createStatement().executeUpdate("DELETE FROM `tournament_players` WHERE `player_team` =" +  teams.getIdOfTeam());
             con.close();
         } catch (SQLException ex) {
             System.err.println("Error" + ex);
         }
-
-        teamsSelected.forEach(allTeams::remove);
+        loadTeam();
     }
 
     @FXML
     private void loadTeam() throws FileNotFoundException {
-
-        try {
-            Connection con = getConnection();
-            dataTeams = FXCollections.observableArrayList();
-
-            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM `tournament_teams` WHERE `tournament_id` = " + selectedTournament);
-            while (rs.next()) {
-                Teams team = new Teams(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getInt(4),  rs.getInt(5),  rs.getInt(6));
-                ResultSet result = con.createStatement().executeQuery("SELECT `player_name` FROM `tournament_players` WHERE `player_team` = " + rs.getInt(1));
-                result.next();
-                team.addFirstPlayer(result.getString(1));
-                result.next();
-                team.addSecondPlayer(result.getString(1));
-                dataTeams.add(team);
-
-            }
-            con.close();
-        } catch (SQLException ex) {
-            System.err.println("Error" + ex);
-        }
-
+        FETCH_DATA(FETCH_TEAMS);
         columnNameTeam.setCellValueFactory(new PropertyValueFactory<>("team_name"));
         columnPlayer1Name.setCellValueFactory(new PropertyValueFactory<>("player1_name"));
         columnPlayer2Name.setCellValueFactory(new PropertyValueFactory<>("player2_name"));
         columnTeamGoals.setCellValueFactory(new PropertyValueFactory<>("team_goals"));
         tableTeams.setItems(null);
         tableTeams.setItems(dataTeams);
-
     }
 
     @FXML
@@ -269,26 +299,10 @@ public class Controller {
     private TableColumn<Teams, String> columnScore;
     @FXML
     private javafx.scene.control.TableView<Game> tableGames;
-    @FXML
-    private Button resetGames;
-    @FXML
-    private Button startGame;
-    @FXML
-    private Button nextStage;
 
     @FXML
     private void loadGames(){
-        try {
-            Connection connHandle = getConnection();
-            ResultSet r = connHandle.createStatement().executeQuery("SELECT * `tournament_games` WHERE `tournament_id` =" + selectedTournament);
-            while(r.next()){
-                GameData.add(new Game(r.getInt(1), r.getInt(2), r.getInt(3), 0, 0, dataTeams.get(r.getInt()-1).getTeam_name(), dataTeams.get(secondTeam-1).getTeam_name() ));
-            }
-            connHandle.close();
-        }
-        catch (SQLException ex) {
-            System.err.println("Error" + ex);
-        }
+        FETCH_DATA(FETCH_GAMES);
         columnFirstTeam.setCellValueFactory(new PropertyValueFactory<>("firstTeamName"));
         columnSecondTeam.setCellValueFactory(new PropertyValueFactory<>("secondTeamName"));
         columnScore.setCellValueFactory(new PropertyValueFactory<>("Score"));
@@ -296,33 +310,61 @@ public class Controller {
         tableGames.setItems(null);
         tableGames.setItems(GameData);
     }
+
+
     @FXML
     private void StartGame(ActionEvent event){
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Match.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root1));
-            stage.show();
+            selectedGame = tableGames.getSelectionModel().getSelectedIndex();
+            System.out.println(tableGames.getSelectionModel().getSelectedItems());
+            System.out.println(selectedGame);
+            loadGames();
+            if(GameData.get(selectedGame).getFirstTeamScore() == 9 || GameData.get(selectedGame).getSecondTeamScore() == 9){
+                AlertBox.display("Invalid game","\nThis game has been already played.\n\n\n");
+            }
+            else{
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Match.fxml"));
+
+
+                Parent root1 = (Parent) fxmlLoader.load();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root1));
+                stage.show();
+            }
+
+
+
+
         } catch(Exception e) {
             e.printStackTrace();
         }
     }
     @FXML
-    private void ResetGames(ActionEvent e)  throws FileNotFoundException{
+    private void ResetGames(ActionEvent e){
         try{
             Connection connHandle = getConnection();
             connHandle.createStatement().executeUpdate("DELETE FROM `tournament_games` WHERE `tournament_id` =" + selectedTournament);
-            if(dataTeams.size() % 2 != 0){
-                AlertBox.display("Invalid Number of Teams", "   There must be an even number of teams.    \n\n\n\n");
+            boolean invalidNumberOfTeams = true;
+            for(int i = 1; i < dataTeams.size(); i++){
+                if(Math.pow(2, i) == dataTeams.size())
+                    invalidNumberOfTeams = false;
+            }
+            if(invalidNumberOfTeams){
+                AlertBox.display("Invalid Number of Teams", "   There must be n^2 number of teams.    \n\n\n\n");
             }
             else{
+                /*
+                    =========================================================
+                            GENERATE MATCHES ALGORITHM
+                    =========================================================
+                 */
                 GameData = FXCollections.observableArrayList();
                 Random r = new Random();
                 int numberOfGames = 0, firstTeam, secondTeam;
                 ArrayList<Integer> usedTeams = new ArrayList<>();
                 while(numberOfGames != dataTeams.size() / 2){
                     boolean condition = false;
+                    int x;
                     while(!condition){
                         firstTeam = r.nextInt(dataTeams.size()) + 1;
                         secondTeam = r.nextInt(dataTeams.size()) + 1;
@@ -330,14 +372,17 @@ public class Controller {
                             usedTeams.add(firstTeam);
                             usedTeams.add(secondTeam);
                             condition = true;
-                            connHandle.createStatement().executeUpdate("INSERT INTO `tournament_games` (`game_team1`,`game_team2`,`tournament_id`) VALUES ('" + firstTeam +"', '" + secondTeam +"', '" + selectedTournament +"' )");
+                            connHandle.createStatement().executeUpdate("INSERT INTO `tournament_games` (`game_team1`,`game_team2`,`tournament_id`) VALUES ('" + dataTeams.get(firstTeam-1).getIdOfTeam() +"', '" + dataTeams.get(secondTeam-1).getIdOfTeam() +"', '" + selectedTournament +"' )");
                             ResultSet re = connHandle.createStatement().executeQuery("SELECT `game_id` FROM `tournament_games` ORDER BY game_id DESC LIMIT 1");
                             re.next();
-                            GameData.add(new Game(re.getInt(1), firstTeam, secondTeam, 0, 0, dataTeams.get(firstTeam-1).getTeam_name(), dataTeams.get(secondTeam-1).getTeam_name() ));
+                            GameData.add(new Game(re.getInt(1),  dataTeams.get(firstTeam-1).getIdOfTeam(), dataTeams.get(secondTeam-1).getIdOfTeam(), 0, 0, dataTeams.get(firstTeam-1).getTeam_name(), dataTeams.get(secondTeam-1).getTeam_name(), firstTeam, secondTeam ));
                         }
                     }
+                    connHandle.createStatement().executeUpdate("UPDATE `tournament_teams` SET `team_winnings` = 0, `team_played_games` = 0 WHERE `tournament_id` ="  +selectedTournament);
                     numberOfGames++;
                 }
+
+
                 columnFirstTeam.setCellValueFactory(new PropertyValueFactory<>("firstTeamName"));
                 columnSecondTeam.setCellValueFactory(new PropertyValueFactory<>("secondTeamName"));
                 columnScore.setCellValueFactory(new PropertyValueFactory<>("Score"));
@@ -356,8 +401,137 @@ public class Controller {
     }
     @FXML
     private void NextStage(ActionEvent e){
+        FETCH_DATA(FETCH_GAMES);
+        if(GameData.size() < 1) {
+            AlertBox.display("Tournament ended!", "      Congratulations to the winner.\n\n      ");
+        }
+        else {
+            System.out.println("generate matches");
+            setWinnerTeams();
+            getWinnerTeams();
+            loadGames();
+        }
+        /*FETCH_DATA(FETCH_TEAMS);
+        int teamWinnings[] = new int[dataTeams.size()];
+        int teamPlayerGames[] = new int[dataTeams.size()];
+        int n = 0, z = dataTeams.size(),LastNumberOfWinnings = 0;
+
+        for(int i = 0; i < dataTeams.size(); i++){
+            teamWinnings[dataTeams.get(i).getTeam_winnings()]++;
+            teamPlayerGames[dataTeams.get(i).getTeamGames()]++;
+            if(dataTeams.get(i).getTeam_winnings() > LastNumberOfWinnings)
+                LastNumberOfWinnings = dataTeams.get(i).getTeam_winnings();
+        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+        while(z > 1){
+            n++;
+            z /= 2;
+        }
+        boolean updatequery = false;
+        for(int i = 1; i <= n; i++){
+            System.out.println(teamPlayerGames[i]);
+            if(teamPlayerGames[i] == Math.pow(2, n - i + 1)){
+                if(teamPlayerGames[i] == teamWinnings[i] * 2 || teamWinnings[i] == 0 && i == 1)
+
+                updatequery = true;
+            }
+            else{
+                updatequery = false;
+            }
+        }
+        if(updatequery){
+            ArrayList<Integer> Teams = new ArrayList<>();
+            ArrayList<Integer> usedTeams = new ArrayList<>();
+            Random r = new Random();
+            int numberOfGames = 0, firstTeam, secondTeam;
+            for (int i = 0; i < dataTeams.size(); i++) {
+                if(dataTeams.get(i).getTeam_winnings() == LastNumberOfWinnings){
+                    Teams.add(i);
+                }
+            }
+            int size = Teams.size();
+            while(numberOfGames !=  size/ 2){
+                System.out.println(numberOfGames + "-" + size);
+                boolean condition = false;
+                while(!condition){
+                    firstTeam = r.nextInt(dataTeams.size()) + 1;
+                    secondTeam = r.nextInt(dataTeams.size()) + 1;
+                    if(firstTeam != secondTeam && Teams.indexOf(firstTeam) != -1 && Teams.indexOf(secondTeam) != -1 && usedTeams.indexOf(firstTeam) == -1 && usedTeams.indexOf(secondTeam) == -1){
+                        condition = true;
+
+                        try {
+                            Connection connHandle = getConnection();
+                            connHandle.createStatement().executeUpdate("INSERT INTO `tournament_games` (`game_team1`,`game_team2`,`tournament_id`) VALUES ('" + dataTeams.get(firstTeam).getIdOfTeam() + "', '" + dataTeams.get(secondTeam).getIdOfTeam() + "', '" + selectedTournament + "' )");
+                            ResultSet re = connHandle.createStatement().executeQuery("SELECT `game_id` FROM `tournament_games` ORDER BY game_id DESC LIMIT 1");
+                            re.next();
+                            GameData.add(new Game(re.getInt(1),  dataTeams.get(firstTeam).getIdOfTeam(), dataTeams.get(secondTeam).getIdOfTeam(), 0, 0, dataTeams.get(firstTeam).getTeam_name(), dataTeams.get(secondTeam).getTeam_name(), firstTeam, secondTeam ));
+                            usedTeams.add(firstTeam);
+                            usedTeams.add(secondTeam);
+                        }
+                        catch (SQLException Ex){
+                            System.out.println("SQL ERROR: " + Ex);
+                        }
+
+                    }
+                }
+                numberOfGames++;
+            }
+
+        }
+        loadGames();*/
 
     }
 
+    private void setWinnerTeams() {
+        try {
+            Connection connHandle = getConnection();
+            ResultSet rs = connHandle.createStatement().executeQuery("SELECT * FROM tournament_games WHERE ended=0");
+            while(rs.next()) {
+                if(rs.getInt(4) > rs.getInt(5)) {
+                    connHandle.createStatement().executeUpdate("UPDATE `tournament_games` SET ended=1 WHERE game_id=" + rs.getInt(1));
+                    connHandle.createStatement().executeUpdate("UPDATE `tournament_teams` SET winner=0 WHERE team_id=" + rs.getInt(2));
+                }
+                else {
+                    connHandle.createStatement().executeUpdate("UPDATE `tournament_games` SET ended=1 WHERE game_id=" + rs.getInt(1));
+                    connHandle.createStatement().executeUpdate("UPDATE `tournament_teams` SET winner=0 WHERE team_id=" + rs.getInt(3));
+                }
+            }
+        }
+        catch (SQLException Ex){
+            System.out.println("SQL ERROR: " + Ex);
+        }
+    }
 
+    private void getWinnerTeams() {
+        try {
+            Connection con = getConnection();
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT team_id FROM tournament_teams WHERE tournament_id=" + selectedTournament + " AND winner=1");
+            ArrayList teams = new ArrayList();
+            while (rs.next()) {
+                teams.add(rs.getInt(1));
+            }
+            Collections.shuffle(teams);
+            for(int i=0; i < teams.size()/2; i++) {
+                System.out.println("Match " + i + ": " + teams.get(i) + " vs " + teams.get(i+teams.size()/2));
+                createMatch((int)teams.get(i), (int)teams.get(i+teams.size()/2));
+            }
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createMatch(int team1_id, int team2_id) {
+        try {
+            String sql = "INSERT INTO tournament_games(game_team1,game_team2,tournament_id) VALUES ('"+team1_id+"','"+team2_id+"','"+selectedTournament+"')";
+
+            Connection con = getConnection();
+            Statement stmt = con.createStatement();
+            stmt.executeUpdate(sql);
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

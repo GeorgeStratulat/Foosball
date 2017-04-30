@@ -12,9 +12,10 @@ public class Players {
     private final StringProperty team;
     private final IntegerProperty id;
     private final StringProperty birthday;
+    private final IntegerProperty teamID;
 
-    public Players(int id, String name, String team, String birthday, String email, int goals){
-
+    public Players(int id, String name, String team, String birthday, String email, int goals, int teamID){
+        this.teamID = new SimpleIntegerProperty(teamID);
         this.id = new SimpleIntegerProperty(id);
         this.goals = new SimpleIntegerProperty(goals) ;
         this.name = new SimpleStringProperty(name);
@@ -23,6 +24,33 @@ public class Players {
         this.birthday = new SimpleStringProperty(birthday);
     }
 
+    public IntegerProperty goalsProperty() {
+        return goals;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
+    }
+
+    public StringProperty birthdayProperty() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday.set(birthday);
+    }
+
+    public int getTeamID() {
+        return teamID.get();
+    }
+
+    public IntegerProperty teamIDProperty() {
+        return teamID;
+    }
+
+    public void setTeamID(int teamID) {
+        this.teamID.set(teamID);
+    }
 
     public int getGoals(){return goals.get();}
 

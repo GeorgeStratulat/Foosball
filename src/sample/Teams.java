@@ -15,18 +15,26 @@ public class Teams {
     private final StringProperty team_name;
     private final IntegerProperty tournament_id;
     private int team_winnings;
-    private final int team_loses;
+    private int teamGames;
     private final IntegerProperty team_goals;
 
-    public Teams(int team_id, int tournament_id, String team_name,  int team_goals, int team_winnings, int team_loses) {
+    public Teams(int team_id, int tournament_id, String team_name,  int team_goals, int team_winnings, int teamGames) {
 
         this.team_id = new SimpleIntegerProperty(team_id);
         this.team_name = new SimpleStringProperty(team_name);
         this.tournament_id = new SimpleIntegerProperty(tournament_id);
         this.team_goals = new SimpleIntegerProperty(team_goals);
         this.team_winnings = team_winnings;
-        this.team_loses = team_loses;
+        this.teamGames = teamGames;
 
+    }
+
+    public int getTeamGames() {
+        return teamGames;
+    }
+
+    public void setTeamGames(int c){
+        this.teamGames = c;
     }
 
     public void addFirstPlayer(String playerName){
@@ -72,14 +80,6 @@ public class Teams {
         this.player2_name.set(player2_name);
     }
 
-    public int getTeam_loses() {
-        return team_loses;
-    }
-
-    public int getIdOfTeam(){
-
-        return team_id.get();
-    }
 
     public String getTeam_name() {
         return team_name.get();
@@ -98,23 +98,20 @@ public class Teams {
         team_id.set(value);
     }
 
-
-    public StringProperty nameProperty() {
-
-        return team_name;
+    public int getIdOfTeam() {
+        return team_id.get();
     }
 
-    public IntegerProperty idProperty(){
-
+    public IntegerProperty team_idProperty() {
         return team_id;
     }
 
-    public int getWinner(){
+    public int getTeam_winnings(){
 
         return team_winnings;
     }
 
-    public void setWinner(int value){
+    public void setTeam_winnings(int value){
 
         this.team_winnings = value;
     }

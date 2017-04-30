@@ -16,8 +16,10 @@ public class Game {
     private StringProperty Score;
     private StringProperty firstTeamName;
     private StringProperty secondTeamName;
+    private int firstTeamScriptID;
+    private int secondTeamScriptID;
 
-    public Game(int gameId, int firstTeam, int secondTeam, int firstTeamScore, int secondTeamScore, String firstTeamName, String secondTeamName) {
+    public Game(int gameId, int firstTeam, int secondTeam, int firstTeamScore, int secondTeamScore, String firstTeamName, String secondTeamName, int firstTeamScriptID, int secondTeamScriptID) {
         this.gameId = new SimpleIntegerProperty(gameId);
         this.firstTeam = new SimpleIntegerProperty(firstTeam);
         this.secondTeam = new SimpleIntegerProperty(secondTeam);
@@ -26,6 +28,24 @@ public class Game {
         this.Score = new SimpleStringProperty("0-0");
         this.firstTeamName = new SimpleStringProperty(firstTeamName);
         this.secondTeamName = new SimpleStringProperty(secondTeamName);
+        this.firstTeamScriptID = firstTeamScriptID;
+        this.secondTeamScriptID = secondTeamScriptID;
+    }
+
+    public int getFirstTeamScriptID() {
+        return firstTeamScriptID;
+    }
+
+    public void setFirstTeamScriptID(int firstTeamScriptID) {
+        this.firstTeamScriptID = firstTeamScriptID;
+    }
+
+    public int getSecondTeamScriptID() {
+        return secondTeamScriptID;
+    }
+
+    public void setSecondTeamScriptID(int secondTeamScriptID) {
+        this.secondTeamScriptID = secondTeamScriptID;
     }
 
     public String getFirstTeamName() {

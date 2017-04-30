@@ -193,83 +193,11 @@ public class GameController implements  Initializable{
                 Connection connHandle = getConnection();
                 connHandle.createStatement().executeUpdate("UPDATE `tournament_players` SET `player_goals` = `player_goals` + 1 WHERE `player_id` = " + PlayerData.get(playerID).getId() + " LIMIT 1");
                 connHandle.createStatement().executeUpdate("UPDATE `tournament_games` SET `game_team" + team + "_score` = `game_team" + team + "_score` + 1 WHERE `game_id` = " + GameData.get(selectedGame).getGameId() + " LIMIT 1");
-
+                connHandle.createStatement().executeUpdate("UPDATE `tournament_teams` SET `team_goals` = `team_goals` + 1 WHERE `team_id` = " + PlayerData.get(playerID).getTeamID());
                 if(updateTeams){
                     connHandle.createStatement().executeUpdate("UPDATE `tournament_teams` SET `team_winnings` = "+ TeamData.get(winnerTeam).getTeam_winnings()+", `team_played_games` =" + TeamData.get(winnerTeam).getTeamGames() +" WHERE `team_id`=" + TeamData.get(winnerTeam).getIdOfTeam());
                     connHandle.createStatement().executeUpdate("UPDATE `tournament_teams` SET `team_played_games` =" + TeamData.get(loserTeam).getTeamGames() +" WHERE `team_id`=" + TeamData.get(loserTeam).getIdOfTeam());
                 }
-//                int
-//                        totalNumberOfGames = 0,
-//                        totalNumberOfWinnings = 0,
-//                        n = 0,
-//                        z = TeamData.size(),
-//                        LastNumberOfWinnings = 0,
-//                        zeroData = 0;
-//                while(z>1){
-//                    n++;
-//                    z /= 2;
-//                }
-//                z = n;
-//                boolean executeQuery = true;
-//                for(int j = 1; j <= n; j++) {
-//                    totalNumberOfGames = 0;
-//                    totalNumberOfWinnings = 0;
-//                    for (int i = 0; i < TeamData.size(); i++) {
-//                        if(TeamData.get(i).getTeamGames() == j)
-//                            totalNumberOfGames ++;
-//                        if(TeamData.get(i).getTeam_winnings() == j)
-//                            totalNumberOfWinnings ++;
-//                        if(TeamData.get(i).getTeam_winnings() > LastNumberOfWinnings)
-//                            LastNumberOfWinnings = TeamData.get(i).getTeam_winnings();
-//                    }
-//                    if(totalNumberOfGames == 0 && totalNumberOfWinnings == 0){
-//                        zeroData++;
-//                        continue;
-//                    }
-//                    if(totalNumberOfGames != Math.pow(2, z) && Math.pow(2, z-1) != totalNumberOfWinnings){
-//                        executeQuery = false;
-//                        System.out.println("totalNumberOfGames:" + totalNumberOfGames);
-//                        System.out.println("totalNumberOfGames:" + totalNumberOfWinnings);
-//                        System.out.println("ID:" + j);
-//                    }
-//
-//                    else if(totalNumberOfGames == Math.pow(2, z) && Math.pow(2, z-1) == totalNumberOfWinnings)
-//                        executeQuery = true;
-//                    z--;
-//                }
-//                if(zeroData == 3)
-//                    executeQuery = false;
-//                if(executeQuery){
-//                    ArrayList<Integer> Teams = new ArrayList<>();
-//                    ArrayList<Integer> usedTeams = new ArrayList<>();
-//                    Random r = new Random();
-//                    int numberOfGames = 0, firstTeam, secondTeam;
-//                    for (int i = 0; i < TeamData.size(); i++) {
-//                        if(TeamData.get(i).getTeam_winnings() == LastNumberOfWinnings){
-//                            Teams.add(i);
-//                        }
-//                    }
-//                    int size = Teams.size();
-//                    while(numberOfGames !=  size/ 2){
-//                        System.out.println(numberOfGames + "-" + size);
-//                        boolean condition = false;
-//                        while(!condition){
-//                            firstTeam = r.nextInt(TeamData.size()) + 1;
-//                            secondTeam = r.nextInt(TeamData.size()) + 1;
-//                            if(firstTeam != secondTeam && Teams.indexOf(firstTeam) != -1 && Teams.indexOf(secondTeam) != -1 && usedTeams.indexOf(firstTeam) == -1 && usedTeams.indexOf(secondTeam) == -1){
-//                                condition = true;
-//                                connHandle.createStatement().executeUpdate("INSERT INTO `tournament_games` (`game_team1`,`game_team2`,`tournament_id`) VALUES ('" + TeamData.get(firstTeam).getIdOfTeam() +"', '" + TeamData.get(secondTeam).getIdOfTeam() +"', '" + selectedTournament +"' )");
-//                                ResultSet re = connHandle.createStatement().executeQuery("SELECT `game_id` FROM `tournament_games` ORDER BY game_id DESC LIMIT 1");
-//                                re.next();
-//                                GameData.add(new Game(re.getInt(1),  TeamData.get(firstTeam).getIdOfTeam(), TeamData.get(secondTeam).getIdOfTeam(), 0, 0, TeamData.get(firstTeam).getTeam_name(), TeamData.get(secondTeam).getTeam_name(), firstTeam, secondTeam ));
-//                                usedTeams.add(firstTeam);
-//                                usedTeams.add(secondTeam);
-//                            }
-//                        }
-//                        numberOfGames++;
-//                    }
-//
-//                }
                 connHandle.close();
             }
             catch (SQLException Ex){
@@ -277,9 +205,6 @@ public class GameController implements  Initializable{
             }
 
         }
-    }
-    private void GenerateNewGames(){
-
     }
     @FXML
     private void player1OfTheFirstTesmScores(ActionEvent e){
